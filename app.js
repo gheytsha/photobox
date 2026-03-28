@@ -34,6 +34,7 @@
     progressFill: $('#progress-fill'),
     progressText: $('#progress-text'),
     btnCapture: $('#btn-capture'),
+    btnMirror: $('#btn-mirror'),
     gifResult: $('#gif-result'),
     photoLoading: $('#photo-loading'),
     mastheadDate: $('.masthead-date'),
@@ -47,11 +48,13 @@
   let capturedFrames = [];
   let generatedGifBlob = null;
   let isCapturing = false;
+  let isMirrored = true; // Default: mirror ON (selfie mode)
 
   // --- INIT ---
   function init() {
     setMastheadDate();
     bindEvents();
+    els.btnMirror.classList.add('active'); // Default mirror ON
     startCamera();
   }
 
@@ -67,6 +70,7 @@
     els.btnRetake.addEventListener('click', handleRetake);
     els.btnDownloadGif.addEventListener('click', handleDownloadGif);
     els.btnDownloadImage.addEventListener('click', handleDownloadImage);
+    els.btnMirror.addEventListener('click', handleMirrorToggle);
   }
 
   // --- SCREEN MANAGEMENT ---
@@ -89,6 +93,7 @@
       });
       els.video.srcObject = stream;
       await els.video.play();
+      applyMirror();
       initPreviewCanvas();
     } catch (err) {
       alert('Tidak dapat mengakses kamera. Pastikan izin kamera telah diberikan.\n\n' + err.message);
@@ -100,6 +105,23 @@
       stream.getTracks().forEach((t) => t.stop());
       stream = null;
     }
+  }
+
+  // --- MIRROR ---
+  function applyMirror() {
+    if (isMirrored) {
+      els.video.classList.add('mirrored');
+      els.previewCanvas.classList.add('mirrored');
+    } else {
+      els.video.classList.remove('mirrored');
+      els.previewCanvas.classList.remove('mirrored');
+    }
+  }
+
+  function handleMirrorToggle() {
+    isMirrored = !isMirrored;
+    els.btnMirror.classList.toggle('active', isMirrored);
+    applyMirror();
   }
 
   // --- PREVIEW CANVAS (grayscale + grain) ---
@@ -173,7 +195,13 @@
     const sx = (vw - sw) / 2;
     const sy = (vh - sh) / 2;
 
+    // Apply horizontal flip if mirrored
+    if (isMirrored) {
+      ctx.translate(w, 0);
+      ctx.scale(-1, 1);
+    }
     ctx.drawImage(video, sx, sy, sw, sh, 0, 0, w, h);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
 
     // Apply grayscale + heavy grain
     const imageData = ctx.getImageData(0, 0, w, h);

@@ -152,10 +152,63 @@ body {
 /* Camera Controls */
 .camera-controls {
   display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  width: 100%;
+}
+
+.capture-wrapper {
+  display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  width: 100%;
+}
+
+/* Mirror Toggle */
+.btn-mirror {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: var(--paper);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-mirror:hover {
+  border-color: rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.08);
+}
+
+.btn-mirror.active {
+  border-color: var(--paper);
+  background: rgba(255,255,255,0.12);
+}
+
+.btn-mirror svg {
+  transition: transform 0.3s ease;
+}
+
+.btn-mirror.active svg {
+  transform: scaleX(-1);
+}
+
+#mirror-label {
+  font-family: 'Special Elite', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Mirror class for video/canvas */
+.mirrored {
+  transform: scaleX(-1);
 }
 
 .btn-capture {
