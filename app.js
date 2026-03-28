@@ -32,11 +32,15 @@
     btnCapture: $('#btn-capture'),
     btnMirror: $('#btn-mirror'),
     gifResult: $('#gif-result'),
-    photoLoading: $('#photo-loading'),
+    photoLoadingGif: $('#photo-loading-gif'),
+    staticPhoto: $('#static-photo'),
     mastheadDate: $('.masthead-date'),
+    mastheadDateStatic: $('.masthead-date-static'),
     btnRetake: $('#btn-retake'),
     btnDownloadGif: $('#btn-download-gif'),
     btnDownloadImage: $('#btn-download-image'),
+    newspaperGif: $('#newspaper-gif'),
+    newspaperStatic: $('#newspaper-static'),
   };
 
   // --- STATE ---
@@ -59,6 +63,7 @@
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     const dateStr = now.toLocaleDateString('id-ID', options);
     els.mastheadDate.textContent = dateStr;
+    els.mastheadDateStatic.textContent = dateStr;
   }
 
   function bindEvents() {
@@ -311,15 +316,28 @@
 
   function displayResult() {
     console.log('displayResult called, gifBlob size:', generatedGifBlob ? generatedGifBlob.size : 'null');
+
+    // Set GIF to animated newspaper
     if (generatedGifBlob && generatedGifBlob.size > 0) {
       const url = URL.createObjectURL(generatedGifBlob);
       els.gifResult.src = url;
       els.gifResult.classList.add('active');
-      els.photoLoading.classList.add('hidden');
-      console.log('GIF displayed, size:', generatedGifBlob.size, 'bytes');
+      els.photoLoadingGif.classList.add('hidden');
     } else {
-      console.error('GIF blob is empty or null');
-      els.photoLoading.innerHTML = '<span style="color:#c00">Gagal membuat GIF. Coba lagi.</span>';
+      els.photoLoadingGif.innerHTML = '<span style="color:#c00">Gagal membuat GIF. Coba lagi.</span>';
+    }
+
+    // Set static photo (first frame) to static newspaper
+    if (capturedFrames.length > 0) {
+      const staticCanvas = els.staticPhoto;
+      const sourceCanvas = capturedFrames[0];
+      staticCanvas.width = sourceCanvas.width;
+      staticCanvas.height = sourceCanvas.height;
+      staticCanvas.style.width = '100%';
+      staticCanvas.style.height = '100%';
+      staticCanvas.style.objectFit = 'cover';
+      const ctx = staticCanvas.getContext('2d');
+      ctx.drawImage(sourceCanvas, 0, 0);
     }
   }
 
@@ -329,7 +347,12 @@
     generatedGifBlob = null;
     els.gifResult.src = '';
     els.gifResult.classList.remove('active');
-    els.photoLoading.classList.remove('hidden');
+    els.photoLoadingGif.classList.remove('hidden');
+    els.photoLoadingGif.innerHTML = '<span>MEMUAT FOTO...</span>';
+
+    // Clear static photo
+    const ctx = els.staticPhoto.getContext('2d');
+    ctx.clearRect(0, 0, els.staticPhoto.width, els.staticPhoto.height);
 
     // Restart camera
     startCamera();
@@ -349,10 +372,23 @@
   }
 
   async function handleDownloadImage() {
-    const newspaper = document.getElementById('newspaper');
+    const newspaper = els.newspaperStatic;
 
     try {
-      const canvas = await captureElementAsImage(newspaper);
+      // Temporarily remove transform scaling for accurate capture
+      const originalTransform = newspaper.style.transform;
+      newspaper.style.transform = 'none';
+
+      const canvas = await html2canvas(newspaper, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#f5f0e8',
+        logging: false,
+      });
+
+      // Restore transform
+      newspaper.style.transform = originalTransform;
+
       canvas.toBlob(function (blob) {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -367,163 +403,6 @@
       console.error('Download error:', err);
       alert('Gagal mengunduh gambar koran.');
     }
-  }
-
-  // --- SIMPLE ELEMENT CAPTURE ---
-  // A lightweight alternative to html2canvas
-  function captureElementAsImage(element) {
-    return new Promise((resolve) => {
-      // Create a canvas that matches the element
-      const rect = element.getBoundingClientRect();
-      const scale = 2; // 2x for retina
-      const canvas = document.createElement('canvas');
-      canvas.width = rect.width * scale;
-      canvas.height = rect.height * scale;
-      const ctx = canvas.getContext('2d');
-      ctx.scale(scale, scale);
-
-      // Fill background
-      ctx.fillStyle = '#f5f0e8';
-      ctx.fillRect(0, 0, rect.width, rect.height);
-
-      // Draw text representation
-      // Since full DOM-to-canvas is complex without html2canvas,
-      // we'll draw a simplified version
-      drawNewspaperToCanvas(ctx, rect.width, rect.height);
-
-      resolve(canvas);
-    });
-  }
-
-  function drawNewspaperToCanvas(ctx, w, h) {
-    // Background
-    ctx.fillStyle = '#f5f0e8';
-    ctx.fillRect(0, 0, w, h);
-
-    // Add grain texture
-    for (let i = 0; i < w * h * 0.01; i++) {
-      const x = Math.random() * w;
-      const y = Math.random() * h;
-      const alpha = Math.random() * 0.03;
-      ctx.fillStyle = `rgba(0,0,0,${alpha})`;
-      ctx.fillRect(x, y, 1, 1);
-    }
-
-    // Rules
-    ctx.fillStyle = '#2a2a2a';
-    ctx.fillRect(30, 20, w - 60, 3);
-
-    // Date
-    const now = new Date();
-    const dateStr = now.toLocaleDateString('id-ID', {
-      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-    });
-    ctx.font = '11px "EB Garamond", Georgia, serif';
-    ctx.fillStyle = '#6b6b6b';
-    ctx.fillText('Edisi Spesial', 35, 50);
-    ctx.fillText(dateStr, w / 2 - 60, 50);
-    ctx.fillText('Rp 5.000', w - 90, 50);
-
-    // Masthead title
-    ctx.font = '42px "Playfair Display", Georgia, serif';
-    ctx.fillStyle = '#1a1a1a';
-    ctx.textAlign = 'center';
-    ctx.fillText('SI PALING BLOK M', w / 2, 90);
-    ctx.textAlign = 'left';
-
-    // Tagline
-    ctx.font = 'italic 12px "EB Garamond", Georgia, serif';
-    ctx.fillStyle = '#6b6b6b';
-    ctx.textAlign = 'center';
-    ctx.fillText('~ Harian Paling Gaul Se-Jakarta Selatan ~', w / 2, 110);
-    ctx.textAlign = 'left';
-
-    // Rule below masthead
-    ctx.fillStyle = '#2a2a2a';
-    ctx.fillRect(30, 120, w - 60, 3);
-
-    // Headline
-    ctx.font = '900 20px "Playfair Display", Georgia, serif';
-    ctx.fillStyle = '#1a1a1a';
-    ctx.textAlign = 'center';
-    ctx.fillText('POTRET DIRI DI TENGAH HIRUK PIKUK KOTA', w / 2, 150);
-    ctx.textAlign = 'left';
-
-    // Subheadline
-    ctx.font = 'italic 13px "EB Garamond", Georgia, serif';
-    ctx.fillStyle = '#3a3a3a';
-    ctx.textAlign = 'center';
-    ctx.fillText('Sebuah Eksperimen Fotografi Digital yang Menangkap Jiwa Masa Kini', w / 2, 170);
-    ctx.textAlign = 'left';
-
-    // Divider
-    ctx.fillStyle = '#2a2a2a';
-    ctx.fillRect(30, 180, w - 60, 1);
-
-    // Photo area - draw the GIF as static image
-    const photoY = 195;
-    const photoW = w - 60;
-    const photoH = photoW * 0.75;
-    ctx.fillStyle = '#d0c8b8';
-    ctx.fillRect(30, photoY, photoW, photoH);
-    ctx.strokeStyle = '#2a2a2a';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(30, photoY, photoW, photoH);
-
-    // Draw the captured frame if available
-    if (capturedFrames.length > 0) {
-      try {
-        const frameCanvas = capturedFrames[0];
-        ctx.drawImage(frameCanvas, 32, photoY + 2, photoW - 4, photoH - 4);
-      } catch (e) {
-        // fallback: leave placeholder
-      }
-    }
-
-    // Caption
-    const captionY = photoY + photoH + 15;
-    ctx.font = 'italic 10px "EB Garamond", Georgia, serif';
-    ctx.fillStyle = '#6b6b6b';
-    ctx.fillText('Fig. 1 — Potret eksklusif yang diambil secara langsung menggunakan teknologi Photobox Retro.', 35, captionY);
-
-    // Article text (simplified)
-    const articleY = captionY + 25;
-    ctx.font = '13px "EB Garamond", Georgia, serif';
-    ctx.fillStyle = '#1a1a1a';
-
-    const lines = [
-      'DALAM era digital yang serba cepat ini, seni fotografi kembali menemukan ruangnya',
-      'di kalangan anak muda Jakarta. Fenomena Photobox Koran Retro menjadi bukti bahwa',
-      'nostalgia akan masa lalu tidak pernah benar-benar pudar dari ingatan kolektif kita.',
-      '',
-      'Blok M, sebagai jantung kegiatan sosial Jakarta Selatan, telah lama menjadi saksi',
-      'bisu perkembangan tren anak muda. Dari zaman kaset pita hingga era digital, kawasan',
-      'ini terus berevolusi menjadi tempat pertemuan budaya pop dan tradisi.',
-    ];
-
-    lines.forEach((line, i) => {
-      if (i === 0) {
-        // Drop cap
-        ctx.font = '900 36px "Playfair Display", Georgia, serif';
-        ctx.fillText('D', 35, articleY + i * 18);
-        ctx.font = '13px "EB Garamond", Georgia, serif';
-        ctx.fillText(line.substring(1), 55, articleY + i * 18);
-      } else {
-        ctx.fillText(line, 35, articleY + i * 18);
-      }
-    });
-
-    // Footer
-    ctx.fillStyle = '#2a2a2a';
-    ctx.fillRect(30, h - 40, w - 60, 3);
-    ctx.font = '10px "EB Garamond", Georgia, serif';
-    ctx.fillStyle = '#6b6b6b';
-    ctx.fillText('Halaman 1 dari 1', 35, h - 20);
-    ctx.textAlign = 'center';
-    ctx.fillText('SI PALING BLOK M © 2026', w / 2, h - 20);
-    ctx.textAlign = 'right';
-    ctx.fillText('Dicetak di Jakarta Selatan', w - 35, h - 20);
-    ctx.textAlign = 'left';
   }
 
   // --- START ---

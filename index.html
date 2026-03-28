@@ -69,97 +69,169 @@
 
   <!-- SCREEN 3: KORAN RESULT -->
   <div id="screen-result" class="screen">
-    <div class="newspaper-wrapper">
-      <div id="newspaper" class="newspaper">
-        <!-- Masthead -->
-        <header class="masthead">
-          <div class="masthead-rule"></div>
-          <div class="masthead-top">
-            <span class="masthead-edisi">Edisi Spesial</span>
-            <span class="masthead-date"></span>
-            <span class="masthead-harga">Rp 5.000</span>
+    <div class="result-container">
+
+      <!-- Newspaper 1: GIF Bergerak -->
+      <div class="newspaper-section">
+        <h3 class="section-label">LIVE PHOTO</h3>
+        <div id="newspaper-gif" class="newspaper">
+          <header class="masthead">
+            <div class="masthead-rule"></div>
+            <div class="masthead-top">
+              <span class="masthead-edisi">Edisi Spesial</span>
+              <span class="masthead-date"></span>
+              <span class="masthead-harga">Rp 5.000</span>
+            </div>
+            <h1 class="masthead-title">SI PALING BLOK M</h1>
+            <p class="masthead-tagline">~ Harian Paling Gaul Se-Jakarta Selatan ~</p>
+            <div class="masthead-rule"></div>
+          </header>
+          <section class="headline-section">
+            <h2 class="headline">POTRET DIRI DI TENGAH HIRUK PIKUK KOTA</h2>
+            <p class="subheadline">Sebuah Eksperimen Fotografi Digital yang Menangkap Jiwa Masa Kini</p>
+          </section>
+          <div class="content-grid">
+            <article class="main-article">
+              <div class="photo-placeholder" id="photo-area-gif">
+                <img id="gif-result" src="" alt="Live Photo" />
+                <div id="photo-loading-gif" class="photo-loading">
+                  <span>MEMUAT FOTO...</span>
+                </div>
+              </div>
+              <p class="photo-caption">
+                <em>Fig. 1</em> &mdash; Potret hidup yang diambil menggunakan teknologi Photobox Retro.
+                Dokumen visual ini merekam momen autentik subjek dalam hitungan detik.
+              </p>
+              <div class="article-text">
+                <p class="dropcap">DALAM era digital yang serba cepat ini, seni fotografi kembali menemukan ruangnya
+                di kalangan anak muda Jakarta. Fenomena Photobox Koran Retro menjadi bukti bahwa nostalgia
+                akan masa lalu tidak pernah benar-benar pudar dari ingatan kolektif kita.</p>
+                <p>Blok M, sebagai jantung kegiatan sosial Jakarta Selatan, telah lama menjadi saksi
+                bisu perkembangan tren anak muda. Dari zaman kaset pita hingga era digital, kawasan ini
+                terus berevolusi menjadi tempat pertemuan budaya pop dan tradisi.</p>
+                <p>"Kami ingin menghadirkan sesuatu yang berbeda," ujar seorang pengembang aplikasi ini.
+                "Menggabungkan teknologi modern dengan estetika koran vintage menciptakan pengalaman yang
+                unik dan tak terlupakan."</p>
+              </div>
+            </article>
+            <aside class="sidebar">
+              <div class="sidebar-article">
+                <h3 class="sidebar-title">TIPS FOTO RETRO</h3>
+                <div class="sidebar-divider"></div>
+                <ol class="tips-list">
+                  <li>Pastikan pencahayaan cukup terang</li>
+                  <li>Pose dengan percaya diri</li>
+                  <li>Gunakan latar belakang sederhana</li>
+                  <li>Ekspresikan diri sebebas mungkin</li>
+                  <li>Hasil terbaik dalam cahaya alami</li>
+                </ol>
+              </div>
+              <div class="sidebar-article">
+                <h3 class="sidebar-title">IKLAN BARIS</h3>
+                <div class="sidebar-divider"></div>
+                <div class="classified-ads">
+                  <p class="ad-item">DIJUAL: Kamera Polaroid vintage kondisi mulus. Hub: 0812-XXXX-XXXX</p>
+                  <p class="ad-item">CARI KAWAN: Komunitas fotografi film Jakarta. CP: @jakarta_filmcam</p>
+                  <p class="ad-item">SEWA STUDIO: Foto retro murah meriah. Jl. Blok M No. 42</p>
+                </div>
+              </div>
+              <div class="sidebar-article quote-box">
+                <blockquote>
+                  <p>"Hidup itu seperti kamera, fokus pada apa yang penting, tangkap momen terbaik, dan kembangkan dari pengalaman negatif."</p>
+                  <cite>~ Anonim, Pengunjung Blok M</cite>
+                </blockquote>
+              </div>
+            </aside>
           </div>
-          <h1 class="masthead-title">SI PALING BLOK M</h1>
-          <p class="masthead-tagline">~ Harian Paling Gaul Se-Jakarta Selatan ~</p>
-          <div class="masthead-rule"></div>
-        </header>
-
-        <!-- Main Headline -->
-        <section class="headline-section">
-          <h2 class="headline">POTRET DIRI DI TENGAH HIRUK PIKUK KOTA</h2>
-          <p class="subheadline">Sebuah Eksperimen Fotografi Digital yang Menangkap Jiwa Masa Kini</p>
-        </section>
-
-        <!-- Main Content Grid -->
-        <div class="content-grid">
-          <!-- Main Article + Photo -->
-          <article class="main-article">
-            <div class="photo-placeholder" id="photo-area">
-              <!-- GIF akan di-insert di sini -->
-              <img id="gif-result" src="" alt="Live Photo" />
-              <div id="photo-loading" class="photo-loading">
-                <span>MEMUAT FOTO...</span>
-              </div>
+          <footer class="newspaper-footer">
+            <div class="footer-rule"></div>
+            <div class="footer-content">
+              <span>Halaman 1 dari 1</span>
+              <span>SI PALING BLOK M &copy; 2026</span>
+              <span>Dicetak di Jakarta Selatan</span>
             </div>
-            <p class="photo-caption" id="photo-caption">
-              <em>Fig. 1</em> &mdash; Potret eksklusif yang diambil secara langsung menggunakan teknologi Photobox Retro.
-              Dokumen visual ini merekam momen autentik subjek dalam hitungan detik.
-            </p>
-            <div class="article-text">
-              <p class="dropcap">DALAM era digital yang serba cepat ini, seni fotografi kembali menemukan ruangnya
-              di kalangan anak muda Jakarta. Fenomena Photobox Koran Retro menjadi bukti bahwa nostalgia
-              akan masa lalu tidak pernah benar-benar pudar dari ingatan kolektif kita.</p>
-              <p>Blok M, sebagai jantung kegiatan sosial Jakarta Selatan, telah lama menjadi saksi
-              bisu perkembangan tren anak muda. Dari zaman kaset pita hingga era digital, kawasan ini
-              terus berevolusi menjadi tempat pertemuan budaya pop dan tradisi.</p>
-              <p>"Kami ingin menghadirkan sesuatu yang berbeda," ujar seorang pengembang aplikasi ini.
-              "Menggabungkan teknologi modern dengan estetika koran vintage menciptakan pengalaman yang
-              unik dan tak terlupakan."</p>
-            </div>
-          </article>
-
-          <!-- Sidebar Articles -->
-          <aside class="sidebar">
-            <div class="sidebar-article">
-              <h3 class="sidebar-title">TIPS FOTO RETRO</h3>
-              <div class="sidebar-divider"></div>
-              <ol class="tips-list">
-                <li>Pastikan pencahayaan cukup terang</li>
-                <li>Pose dengan percaya diri</li>
-                <li>Gunakan latar belakang sederhana</li>
-                <li>Ekspresikan diri sebebas mungkin</li>
-                <li>Hasil terbaik dalam cahaya alami</li>
-              </ol>
-            </div>
-
-            <div class="sidebar-article">
-              <h3 class="sidebar-title">IKLAN BARIS</h3>
-              <div class="sidebar-divider"></div>
-              <div class="classified-ads">
-                <p class="ad-item">DIJUAL: Kamera Polaroid vintage kondisi mulus. Hub: 0812-XXXX-XXXX</p>
-                <p class="ad-item">CARI KAWAN: Komunitas fotografi film Jakarta. CP: @jakarta_filmcam</p>
-                <p class="ad-item">SEWA STUDIO: Foto retro murah meriah. Jl. Blok M No. 42</p>
-              </div>
-            </div>
-
-            <div class="sidebar-article quote-box">
-              <blockquote>
-                <p>"Hidup itu seperti kamera, fokus pada apa yang penting, tangkap momen terbaik, dan kembangkan dari pengalaman negatif."</p>
-                <cite>~ Anonim, Pengunjung Blok M</cite>
-              </blockquote>
-            </div>
-          </aside>
+          </footer>
         </div>
+      </div>
 
-        <!-- Footer -->
-        <footer class="newspaper-footer">
-          <div class="footer-rule"></div>
-          <div class="footer-content">
-            <span>Halaman 1 dari 1</span>
-            <span>SI PALING BLOK M &copy; 2026</span>
-            <span>Dicetak di Jakarta Selatan</span>
+      <!-- Newspaper 2: Foto Statis -->
+      <div class="newspaper-section">
+        <h3 class="section-label">FOTO CETAK</h3>
+        <div id="newspaper-static" class="newspaper">
+          <header class="masthead">
+            <div class="masthead-rule"></div>
+            <div class="masthead-top">
+              <span class="masthead-edisi">Edisi Spesial</span>
+              <span class="masthead-date-static"></span>
+              <span class="masthead-harga">Rp 5.000</span>
+            </div>
+            <h1 class="masthead-title">SI PALING BLOK M</h1>
+            <p class="masthead-tagline">~ Harian Paling Gaul Se-Jakarta Selatan ~</p>
+            <div class="masthead-rule"></div>
+          </header>
+          <section class="headline-section">
+            <h2 class="headline">POTRET DIRI DI TENGAH HIRUK PIKUK KOTA</h2>
+            <p class="subheadline">Sebuah Eksperimen Fotografi Digital yang Menangkap Jiwa Masa Kini</p>
+          </section>
+          <div class="content-grid">
+            <article class="main-article">
+              <div class="photo-placeholder" id="photo-area-static">
+                <canvas id="static-photo"></canvas>
+              </div>
+              <p class="photo-caption">
+                <em>Fig. 1</em> &mdash; Cetakan tunggal dari sesi Photobox Retro.
+                Foto ini merupakan frame terpilih dari serangkaian percobaan pencahayaan.
+              </p>
+              <div class="article-text">
+                <p class="dropcap">DALAM era digital yang serba cepat ini, seni fotografi kembali menemukan ruangnya
+                di kalangan anak muda Jakarta. Fenomena Photobox Koran Retro menjadi bukti bahwa nostalgia
+                akan masa lalu tidak pernah benar-benar pudar dari ingatan kolektif kita.</p>
+                <p>Blok M, sebagai jantung kegiatan sosial Jakarta Selatan, telah lama menjadi saksi
+                bisu perkembangan tren anak muda. Dari zaman kaset pita hingga era digital, kawasan ini
+                terus berevolusi menjadi tempat pertemuan budaya pop dan tradisi.</p>
+                <p>"Kami ingin menghadirkan sesuatu yang berbeda," ujar seorang pengembang aplikasi ini.
+                "Menggabungkan teknologi modern dengan estetika koran vintage menciptakan pengalaman yang
+                unik dan tak terlupakan."</p>
+              </div>
+            </article>
+            <aside class="sidebar">
+              <div class="sidebar-article">
+                <h3 class="sidebar-title">TIPS FOTO RETRO</h3>
+                <div class="sidebar-divider"></div>
+                <ol class="tips-list">
+                  <li>Pastikan pencahayaan cukup terang</li>
+                  <li>Pose dengan percaya diri</li>
+                  <li>Gunakan latar belakang sederhana</li>
+                  <li>Ekspresikan diri sebebas mungkin</li>
+                  <li>Hasil terbaik dalam cahaya alami</li>
+                </ol>
+              </div>
+              <div class="sidebar-article">
+                <h3 class="sidebar-title">IKLAN BARIS</h3>
+                <div class="sidebar-divider"></div>
+                <div class="classified-ads">
+                  <p class="ad-item">DIJUAL: Kamera Polaroid vintage kondisi mulus. Hub: 0812-XXXX-XXXX</p>
+                  <p class="ad-item">CARI KAWAN: Komunitas fotografi film Jakarta. CP: @jakarta_filmcam</p>
+                  <p class="ad-item">SEWA STUDIO: Foto retro murah meriah. Jl. Blok M No. 42</p>
+                </div>
+              </div>
+              <div class="sidebar-article quote-box">
+                <blockquote>
+                  <p>"Hidup itu seperti kamera, fokus pada apa yang penting, tangkap momen terbaik, dan kembangkan dari pengalaman negatif."</p>
+                  <cite>~ Anonim, Pengunjung Blok M</cite>
+                </blockquote>
+              </div>
+            </aside>
           </div>
-        </footer>
+          <footer class="newspaper-footer">
+            <div class="footer-rule"></div>
+            <div class="footer-content">
+              <span>Halaman 1 dari 1</span>
+              <span>SI PALING BLOK M &copy; 2026</span>
+              <span>Dicetak di Jakarta Selatan</span>
+            </div>
+          </footer>
+        </div>
       </div>
 
       <!-- Actions -->
@@ -171,7 +243,8 @@
     </div>
   </div>
 
-  <script src="gif.js?v=3"></script>
-  <script src="app.js?v=3"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="gif.js?v=4"></script>
+  <script src="app.js?v=4"></script>
 </body>
 </html>
