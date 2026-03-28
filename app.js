@@ -8,10 +8,10 @@
   // --- CONFIG ---
   const CONFIG = {
     burstCount: 8,           // Number of frames to capture
-    gifWidth: 480,
-    gifHeight: 640,
-    gifQuality: 10,          // 1=best, 30=fastest
-    gifDelay: 150,           // ms between GIF frames
+    gifWidth: 240,
+    gifHeight: 320,
+    gifQuality: 1,
+    gifDelay: 200,           // ms between GIF frames
     grainIntensity: 25,      // noise grain strength
     countdownSeconds: 3,
   };
@@ -310,11 +310,16 @@
   }
 
   function displayResult() {
-    if (generatedGifBlob) {
+    console.log('displayResult called, gifBlob size:', generatedGifBlob ? generatedGifBlob.size : 'null');
+    if (generatedGifBlob && generatedGifBlob.size > 0) {
       const url = URL.createObjectURL(generatedGifBlob);
       els.gifResult.src = url;
       els.gifResult.classList.add('active');
       els.photoLoading.classList.add('hidden');
+      console.log('GIF displayed, size:', generatedGifBlob.size, 'bytes');
+    } else {
+      console.error('GIF blob is empty or null');
+      els.photoLoading.innerHTML = '<span style="color:#c00">Gagal membuat GIF. Coba lagi.</span>';
     }
   }
 
