@@ -371,38 +371,290 @@
     URL.revokeObjectURL(url);
   }
 
-  async function handleDownloadImage() {
-    const newspaper = els.newspaperStatic;
-
+  function handleDownloadImage() {
     try {
-      // Temporarily remove transform scaling for accurate capture
-      const originalTransform = newspaper.style.transform;
-      newspaper.style.transform = 'none';
-
-      const canvas = await html2canvas(newspaper, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: '#f5f0e8',
-        logging: false,
-      });
-
-      // Restore transform
-      newspaper.style.transform = originalTransform;
-
-      canvas.toBlob(function (blob) {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'si-paling-blok-m-koran.png';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }, 'image/png');
+      const canvas = renderNewspaperToCanvas();
+      const a = document.createElement('a');
+      a.href = canvas.toDataURL('image/png');
+      a.download = 'si-paling-blok-m-koran.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     } catch (err) {
       console.error('Download error:', err);
       alert('Gagal mengunduh gambar koran.');
     }
+  }
+
+  function renderNewspaperToCanvas() {
+    const W = 780;
+    const pad = 35;
+    const contentW = W - pad * 2;
+    const scale = 2; // retina
+    let y = 0;
+
+    // First pass: calculate total height
+    const lineH = 22;
+    const articleLines = [
+      'DALAM era digital yang serba cepat ini, seni fotografi kembali menemukan ruangnya di kalangan anak muda Jakarta. Fenomena Photobox Koran Retro menjadi bukti bahwa nostalgia akan masa lalu tidak pernah benar-benar pudar dari ingatan kolektif kita.',
+      'Blok M, sebagai jantung kegiatan sosial Jakarta Selatan, telah lama menjadi saksi bisu perkembangan tren anak muda. Dari zaman kaset pita hingga era digital, kawasan ini terus berevolusi menjadi tempat pertemuan budaya pop dan tradisi.',
+      '"Kami ingin menghadirkan sesuatu yang berbeda," ujar seorang pengembang aplikasi ini. "Menggabungkan teknologi modern dengan estetika koran vintage menciptakan pengalaman yang unik dan tak terlupakan."',
+    ];
+
+    // Calculate heights
+    const mastheadH = 120;
+    const headlineH = 70;
+    const photoH = Math.round(contentW * 0.5 * 0.75); // main article area photo
+    const captionH = 45;
+    const articleTextH = articleLines.length * 60 + 40;
+    const sidebarH = 350;
+    const mainArticleH = photoH + captionH + articleTextH;
+    const contentH = Math.max(mainArticleH, sidebarH);
+    const footerH = 50;
+    const totalH = mastheadH + headlineH + contentH + footerH + 20;
+
+    // Create canvas
+    const canvas = document.createElement('canvas');
+    canvas.width = W * scale;
+    canvas.height = totalH * scale;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(scale, scale);
+
+    // === BACKGROUND ===
+    ctx.fillStyle = '#f5f0e8';
+    ctx.fillRect(0, 0, W, totalH);
+
+    // Grain texture
+    for (let i = 0; i < W * totalH * 0.005; i++) {
+      const gx = Math.random() * W;
+      const gy = Math.random() * totalH;
+      ctx.fillStyle = `rgba(0,0,0,${Math.random() * 0.03})`;
+      ctx.fillRect(gx, gy, 1, 1);
+    }
+
+    // === MASTHEAD ===
+    // Top rule
+    ctx.fillStyle = '#2a2a2a';
+    ctx.fillRect(pad, 10, contentW, 4);
+
+    // Top info
+    ctx.font = '12px Georgia, serif';
+    ctx.fillStyle = '#6b6b6b';
+    const dateStr = new Date().toLocaleDateString('id-ID', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
+    ctx.textAlign = 'left';
+    ctx.fillText('Edisi Spesial', pad, 32);
+    ctx.textAlign = 'center';
+    ctx.fillText(dateStr, W / 2, 32);
+    ctx.textAlign = 'right';
+    ctx.fillText('Rp 5.000', W - pad, 32);
+    ctx.textAlign = 'left';
+
+    // Title
+    ctx.font = '52px Georgia, serif';
+    ctx.fillStyle = '#1a1a1a';
+    ctx.textAlign = 'center';
+    ctx.fillText('SI PALING BLOK M', W / 2, 82);
+    ctx.textAlign = 'left';
+
+    // Tagline
+    ctx.font = 'italic 13px Georgia, serif';
+    ctx.fillStyle = '#6b6b6b';
+    ctx.textAlign = 'center';
+    ctx.fillText('~ Harian Paling Gaul Se-Jakarta Selatan ~', W / 2, 100);
+    ctx.textAlign = 'left';
+
+    // Bottom rule
+    ctx.fillStyle = '#2a2a2a';
+    ctx.fillRect(pad, 110, contentW, 3);
+
+    y = 125;
+
+    // === HEADLINE ===
+    ctx.font = 'bold 22px Georgia, serif';
+    ctx.fillStyle = '#1a1a1a';
+    ctx.textAlign = 'center';
+    ctx.fillText('POTRET DIRI DI TENGAH HIRUK PIKUK KOTA', W / 2, y + 20);
+
+    ctx.font = 'italic 14px Georgia, serif';
+    ctx.fillStyle = '#3a3a3a';
+    ctx.fillText('Sebuah Eksperimen Fotografi Digital yang Menangkap Jiwa Masa Kini', W / 2, y + 42);
+    ctx.textAlign = 'left';
+
+    // Divider
+    ctx.fillStyle = '#2a2a2a';
+    ctx.fillRect(pad, y + 55, contentW, 1);
+
+    y = y + 65;
+
+    // === CONTENT GRID ===
+    const mainW = contentW - 250;
+    const sideX = pad + mainW + 20;
+
+    // --- MAIN ARTICLE ---
+    // Photo
+    const photoY = y;
+    const photoW = mainW;
+    const photoHH = Math.round(photoW * 0.75);
+
+    ctx.strokeStyle = '#2a2a2a';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(pad, photoY, photoW, photoHH);
+
+    // Draw captured photo
+    if (capturedFrames.length > 0) {
+      const src = capturedFrames[0];
+      ctx.drawImage(src, pad + 1, photoY + 1, photoW - 2, photoHH - 2);
+    } else {
+      ctx.fillStyle = '#d0c8b8';
+      ctx.fillRect(pad + 1, photoY + 1, photoW - 2, photoHH - 2);
+    }
+
+    // Caption
+    const capY = photoY + photoHH + 12;
+    ctx.font = 'italic 11px Georgia, serif';
+    ctx.fillStyle = '#6b6b6b';
+    ctx.fillText('Fig. 1 \u2014 Potret eksklusif yang diambil secara langsung', pad, capY);
+    ctx.fillText('menggunakan teknologi Photobox Retro.', pad, capY + 14);
+
+    // Article text
+    let artY = capY + 40;
+    ctx.font = '14px Georgia, serif';
+    ctx.fillStyle = '#1a1a1a';
+
+    articleLines.forEach((line) => {
+      // Drop cap
+      ctx.font = 'bold 40px Georgia, serif';
+      ctx.fillText(line[0], pad, artY);
+      ctx.font = '14px Georgia, serif';
+      // Wrap remaining text
+      const remaining = line.substring(1);
+      const words = remaining.split(' ');
+      let lineText = '';
+      let lineNum = 0;
+      const maxTextW = mainW - 25;
+
+      words.forEach((word) => {
+        const test = lineText + word + ' ';
+        if (ctx.measureText(test).width > maxTextW && lineText.length > 0) {
+          ctx.fillText(lineText, pad + 22, artY + lineNum * 20);
+          lineText = word + ' ';
+          lineNum++;
+        } else {
+          lineText = test;
+        }
+      });
+      if (lineText.length > 0) {
+        ctx.fillText(lineText, pad + 22, artY + lineNum * 20);
+      }
+      artY += (lineNum + 1) * 20 + 16;
+    });
+
+    // --- SIDEBAR ---
+    let sideY = y;
+
+    // Tips
+    ctx.font = 'bold 12px Georgia, serif';
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillText('TIPS FOTO RETRO', sideX, sideY);
+    sideY += 5;
+    ctx.fillStyle = '#2a2a2a';
+    ctx.fillRect(sideX, sideY, 210, 2);
+    sideY += 18;
+
+    const tips = [
+      '1. Pastikan pencahayaan cukup terang',
+      '2. Pose dengan percaya diri',
+      '3. Gunakan latar belakang sederhana',
+      '4. Ekspresikan diri sebebas mungkin',
+      '5. Hasil terbaik dalam cahaya alami',
+    ];
+    ctx.font = '12px Georgia, serif';
+    ctx.fillStyle = '#3a3a3a';
+    tips.forEach((tip) => {
+      ctx.fillText(tip, sideX, sideY);
+      sideY += 20;
+    });
+
+    sideY += 15;
+
+    // Iklan
+    ctx.font = 'bold 12px Georgia, serif';
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillText('IKLAN BARIS', sideX, sideY);
+    sideY += 5;
+    ctx.fillStyle = '#2a2a2a';
+    ctx.fillRect(sideX, sideY, 210, 2);
+    sideY += 18;
+
+    const ads = [
+      'DIJUAL: Kamera Polaroid vintage',
+      'kondisi mulus. Hub: 0812-XXXX-XXXX',
+      '',
+      'CARI KAWAN: Komunitas fotografi',
+      'film Jakarta. CP: @jakarta_filmcam',
+      '',
+      'SEWA STUDIO: Foto retro murah',
+      'meriah. Jl. Blok M No. 42',
+    ];
+    ctx.font = '11px Georgia, serif';
+    ctx.fillStyle = '#3a3a3a';
+    ads.forEach((ad) => {
+      if (ad.length > 0) ctx.fillText(ad, sideX, sideY);
+      sideY += 16;
+    });
+
+    sideY += 15;
+
+    // Quote box
+    ctx.fillStyle = '#e8dfd3';
+    ctx.fillRect(sideX - 5, sideY, 220, 80);
+    ctx.strokeStyle = '#ccc';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(sideX - 5, sideY, 220, 80);
+
+    ctx.font = 'italic 11px Georgia, serif';
+    ctx.fillStyle = '#3a3a3a';
+    wrapText(ctx, '"Hidup itu seperti kamera, fokus pada apa yang penting, tangkap momen terbaik."', sideX, sideY + 18, 200, 16);
+
+    ctx.font = '10px Georgia, serif';
+    ctx.fillStyle = '#6b6b6b';
+    ctx.fillText('~ Anonim, Pengunjung Blok M', sideX, sideY + 70);
+
+    // === FOOTER ===
+    const footerY = totalH - 40;
+    ctx.fillStyle = '#2a2a2a';
+    ctx.fillRect(pad, footerY, contentW, 3);
+
+    ctx.font = '11px Georgia, serif';
+    ctx.fillStyle = '#6b6b6b';
+    ctx.textAlign = 'left';
+    ctx.fillText('Halaman 1 dari 1', pad, footerY + 20);
+    ctx.textAlign = 'center';
+    ctx.fillText('SI PALING BLOK M \u00A9 2026', W / 2, footerY + 20);
+    ctx.textAlign = 'right';
+    ctx.fillText('Dicetak di Jakarta Selatan', W - pad, footerY + 20);
+    ctx.textAlign = 'left';
+
+    return canvas;
+  }
+
+  function wrapText(ctx, text, x, y, maxW, lineH) {
+    const words = text.split(' ');
+    let line = '';
+    let currentY = y;
+    words.forEach((word) => {
+      const test = line + word + ' ';
+      if (ctx.measureText(test).width > maxW && line.length > 0) {
+        ctx.fillText(line, x, currentY);
+        line = word + ' ';
+        currentY += lineH;
+      } else {
+        line = test;
+      }
+    });
+    if (line.length > 0) ctx.fillText(line, x, currentY);
   }
 
   // --- START ---
