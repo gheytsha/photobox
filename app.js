@@ -8,7 +8,6 @@
   // --- CONFIG ---
   const CONFIG = {
     burstCount: 8,           // Number of frames to capture
-    burstInterval: 120,      // ms between burst frames
     gifWidth: 480,
     gifHeight: 640,
     gifQuality: 10,          // 1=best, 30=fastest
@@ -30,9 +29,6 @@
     previewCanvas: $('#preview-canvas'),
     countdownOverlay: $('#countdown-overlay'),
     countdownNumber: $('#countdown-number'),
-    burstProgress: $('#burst-progress'),
-    progressFill: $('#progress-fill'),
-    progressText: $('#progress-text'),
     btnCapture: $('#btn-capture'),
     btnMirror: $('#btn-mirror'),
     gifResult: $('#gif-result'),
@@ -211,54 +207,46 @@
     return offCanvas;
   }
 
-  // --- COUNTDOWN ---
-  function countdown(seconds) {
+  // --- COUNTDOWN + BURST CAPTURE (combined) ---
+  function countdownWithCapture(seconds, frameCount) {
     return new Promise((resolve) => {
       els.countdownOverlay.classList.remove('hidden');
       let count = seconds;
+      const frames = [];
+      const totalMs = seconds * 1000;
+      const intervalMs = totalMs / frameCount;
+      const startTime = Date.now();
 
+      // Capture frames at intervals during countdown
+      function captureLoop() {
+        const elapsed = Date.now() - startTime;
+        const expectedFrames = Math.min(frameCount, Math.floor(elapsed / intervalMs) + 1);
+
+        while (frames.length < expectedFrames) {
+          frames.push(captureFrame());
+        }
+
+        if (frames.length >= frameCount) {
+          resolve(frames);
+          return;
+        }
+
+        setTimeout(captureLoop, Math.max(10, intervalMs / 2));
+      }
+
+      // Update countdown display
       function tick() {
         els.countdownNumber.textContent = count;
         if (count <= 0) {
           els.countdownOverlay.classList.add('hidden');
-          resolve();
           return;
         }
         count--;
         setTimeout(tick, 1000);
       }
+
       tick();
-    });
-  }
-
-  // --- BURST CAPTURE ---
-  function burstCapture() {
-    return new Promise((resolve) => {
-      const frames = [];
-      let captured = 0;
-
-      els.burstProgress.classList.remove('hidden');
-      els.progressFill.style.width = '0%';
-
-      function captureNext() {
-        if (captured >= CONFIG.burstCount) {
-          els.burstProgress.classList.add('hidden');
-          resolve(frames);
-          return;
-        }
-
-        const frame = captureFrame();
-        frames.push(frame);
-        captured++;
-
-        const pct = (captured / CONFIG.burstCount) * 100;
-        els.progressFill.style.width = pct + '%';
-        els.progressText.textContent = captured + '/' + CONFIG.burstCount + ' frames';
-
-        setTimeout(captureNext, CONFIG.burstInterval);
-      }
-
-      captureNext();
+      captureLoop();
     });
   }
 
@@ -297,11 +285,8 @@
     els.btnCapture.disabled = true;
 
     try {
-      // Countdown
-      await countdown(CONFIG.countdownSeconds);
-
-      // Burst capture
-      capturedFrames = await burstCapture();
+      // Countdown + burst capture berjalan bersamaan
+      capturedFrames = await countdownWithCapture(CONFIG.countdownSeconds, CONFIG.burstCount);
 
       // Stop preview to save resources
       stopPreviewLoop();
